@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:versionupdate/pages/updates.dart';
-import 'package:get/get.dart';
 
 class Devices extends StatefulWidget {
   const Devices({Key? key}) : super(key: key);
@@ -16,23 +15,29 @@ class _DevicesState extends State<Devices> {
   final pageViewController = PageController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  Future getdata() async {
-    String id = Get.parameters['id'].toString();
-    var url = Uri.parse(
-        "http://rwangafinalapp.infinityfreeapp.com/staff/api/devices.php?id=$id");
-    var response = await http.get(url);
-    return jsonDecode(response.body);
-
-    // debugPrint(response.body.length.toString());
-    // debugPrint(response.body[1]['name'].toString());
-    // var json = jsonDecode(response.body);
-    // return json;
-    // json.data.length
-  }
-
   @override
   Widget build(BuildContext context) {
-    // final arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    final arguments = ModalRoute.of(context)!.settings.arguments as Map;
+
+    Future getData(id) async {
+      // String id = Get.parameters['id'].toString();
+      // var url = Uri.parse(
+      //     "https://rastyprojects.000webhostapp.com/staff/api/devices.php?id=$id");
+      // var response = await http.get(url);
+      // return jsonDecode(response.body);
+
+      var url = Uri.parse(
+          "https://rastyprojects.000webhostapp.com/staff/api/devices.php?id=$id");
+      var response = await http.get(url);
+      return jsonDecode(response.body);
+
+      // debugPrint(response.body.length.toString());
+      // debugPrint(response.body[1]['name'].toString());
+      // var json = jsonDecode(response.body);
+      // return json;
+      // json.data.length
+    }
+
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -49,7 +54,7 @@ class _DevicesState extends State<Devices> {
           },
         ),
         title: Text(
-          Get.parameters['brandname'].toString(),
+          arguments['name'].toString(),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -68,10 +73,14 @@ class _DevicesState extends State<Devices> {
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 5, 5),
             child: FutureBuilder(
-              future: getdata(),
+              future: getData(arguments['id']),
               builder: (context, AsyncSnapshot snapshot) {
                 if (!snapshot.hasData) {
-                  return const Text('Loading Data');
+                  return const Center(
+                      child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: CircularProgressIndicator()));
                 } else if (snapshot.hasError) {
                   return const Text('Check your internet');
                 }
@@ -83,11 +92,8 @@ class _DevicesState extends State<Devices> {
                     itemBuilder: (context, i) {
                       return InkWell(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) =>
-                                      Updates(id: snapshot.data[i]['id']))));
+                          Navigator.pushNamed(context, '/updates',
+                              arguments: {'id': snapshot.data[i]['id']});
                         },
                         child: Padding(
                           padding:

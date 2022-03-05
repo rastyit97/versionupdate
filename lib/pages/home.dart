@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -11,7 +10,7 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-const api = "http://rwangafinalapp.infinityfreeapp.com/staff";
+const api = "https://rastyprojects.000webhostapp.com/staff";
 
 class _HomeState extends State<Home> {
   Future getData() async {
@@ -66,11 +65,16 @@ class _HomeState extends State<Home> {
                       if (snapshot.hasData) {
                         return InkWell(
                           onTap: () {
-                            Get.toNamed("/devices", parameters: {
-                              "id": snapshot.data[i]['id'].toString(),
-                              "brandname": snapshot.data[i]['name'].toString(),
-                            });
+                            // Get.toNamed("/devices", parameters: {
+                            //   "id": snapshot.data[i]['id'].toString(),
+                            //   "brandname": snapshot.data[i]['name'].toString(),
+                            // });
                             // Navigator.push(context, MaterialPageRoute(builder: ((context) => Devices(id: snapshot.data[i]['id']))));
+                            Navigator.pushNamed(context, '/devices',
+                                arguments: {
+                                  'id': snapshot.data[i]['id'],
+                                  'name': snapshot.data[i]['name']
+                                });
                           },
                           child: Card(
                             clipBehavior: Clip.antiAliasWithSaveLayer,

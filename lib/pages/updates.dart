@@ -2,123 +2,103 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 class Updates extends StatefulWidget {
-  const Updates({Key? key, required this.id}) : super(key: key);
-  final int id;
+  const Updates({Key? key}) : super(key: key);
+
   @override
-  State<Updates> createState() => _UpdatesState();
+  _UpdatesState createState() => _UpdatesState();
 }
 
 class _UpdatesState extends State<Updates> {
   final pageViewController = PageController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  Future getdata(id) async {
-    var url = Uri.parse(
-        "http://rwangafinalapp.infinityfreeapp.com/staff/api/viewdevice.php?id=$id");
-    Response response = await http.get(url);
-    debugPrint(response.body.length.toString());
-    var json = jsonDecode(response.body);
-    return json;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final arguments = ModalRoute.of(context)!.settings.arguments as Map;
+
+    Future getData(id) async {
+      var url = Uri.parse(
+          "https://rastyprojects.000webhostapp.com/staff/api/viewdevice.php?id=$id");
+      var response = await http.get(url);
+      return jsonDecode(response.body);
+    }
+
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A37EF),
+        backgroundColor: Color(0xFFE76E54),
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFFFFF5F5),
-            size: 30,
-          ),
-          onPressed: () {
-            Navigator.pushNamed(context, '/');
-          },
-        ),
-        title: const Text(
-          'Devises',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            color: Color(0xFFF1F4F7),
-            fontSize: 42,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        actions: [],
         centerTitle: true,
         elevation: 0,
       ),
-      backgroundColor: const Color(0xFFEAE9EE),
       body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 5, 5),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
             child: FutureBuilder(
-                future: getdata(widget.id),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Text('Loading Data');
-                  } else if (snapshot.hasError) {
-                    return const Text('Check your internet');
-                  }
-                  return ListView.builder(
-                      padding: EdgeInsets.zero,
-                      primary: false,
-                      scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, i) {
-                        return Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(5, 5, 5, 5),
-                          child: Container(
-                            width: 100,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEEEEEE),
-                              borderRadius: BorderRadius.circular(15),
-                              shape: BoxShape.rectangle,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  10, 10, 10, 10),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    snapshot.data[i]['device_name'] ??
-                                        'null name',
-                                    style: const TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color.fromARGB(255, 78, 58, 189),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    snapshot.data[i]['company_id'] ??
-                                        'null date',
-                                    style: const TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color.fromARGB(255, 78, 58, 189),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+              future: getData(arguments['id']),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data.length > 0) {
+                    return Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                          child: PageView.builder(
+                            controller: pageViewController,
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (context, i) {
+                              return Card(
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                color: Color(0xFFF5F5F5),
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment(-1, -1),
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                        child: Text(
+                                          "Device Name: " +
+                                              snapshot.data[i]['device_name'],
+                                          textAlign: TextAlign.end,
+                                          style: TextStyle(
+                                            fontFamily: 'Rabar',
+                                            color: Color(0xFF020202),
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      });
-                }),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Center(
+                      child: Text("No Data Found !"),
+                    );
+                  }
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
           ),
         ),
       ),
