@@ -65,11 +65,6 @@ class _HomeState extends State<Home> {
                       if (snapshot.hasData) {
                         return InkWell(
                           onTap: () {
-                            // Get.toNamed("/devices", parameters: {
-                            //   "id": snapshot.data[i]['id'].toString(),
-                            //   "brandname": snapshot.data[i]['name'].toString(),
-                            // });
-                            // Navigator.push(context, MaterialPageRoute(builder: ((context) => Devices(id: snapshot.data[i]['id']))));
                             Navigator.pushNamed(context, '/devices',
                                 arguments: {
                                   'id': snapshot.data[i]['id'],
