@@ -300,6 +300,21 @@ class _UpdatesState extends State<Updates> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFFEFEFFD),
+        unselectedItemColor: const Color(0xFF1D97FF),
+        selectedItemColor: const Color(0xFF6362E7),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.house),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
     );
   }
 }

@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+// ignore: prefer_typing_uninitialized_variables
+var message;
+
 class Devices extends StatefulWidget {
   const Devices({Key? key}) : super(key: key);
   // final int id;
@@ -22,6 +25,7 @@ class _DevicesState extends State<Devices> {
       var url = Uri.parse(
           "https://rastyprojects.000webhostapp.com/staff/api/devices.php?id=$id");
       var response = await http.get(url);
+      message = json.decode(response.body)[0];
       return jsonDecode(response.body);
     }
 
@@ -75,6 +79,35 @@ class _DevicesState extends State<Devices> {
                   scrollDirection: Axis.vertical,
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, i) {
+                    if (message == null) {
+                      return Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        color: Color(0xFFF5F5F5),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment(0, 0),
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                child: Text(
+                                  'No Device Available',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    color: Color(0xFF020202),
+                                    fontSize: 25,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
                     return InkWell(
                       onTap: () {
                         Navigator.pushNamed(context, '/updates', arguments: {
@@ -129,6 +162,21 @@ class _DevicesState extends State<Devices> {
             },
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color(0xFFEFEFFD),
+        unselectedItemColor: const Color(0xFF1D97FF),
+        selectedItemColor: const Color(0xFF6362E7),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.house),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
